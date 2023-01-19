@@ -1,5 +1,7 @@
 import cv2
 import face_recognition
+import time
+import RPi.GPIO as GPIO
 
 # Load the cascade classifier for face detection
 face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
@@ -12,6 +14,10 @@ your_face_encoding = face_recognition.face_encodings(image_of_you)[0]
 
 # Start the camera
 camera = cv2.VideoCapture(0)
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(18, GPIO.OUT)
+GPIO.setup(17, GPIO.OUT)
 
 while True:
     # Read a frame from the camera
@@ -33,15 +39,24 @@ while True:
         if len(detected_face_encoding)>0:
             match = face_recognition.compare_faces([your_face_encoding], detected_face_encoding[0])
             if match[0]:
-                print("Your face detected")
+                print("Door OPENED")
+                GPIO.output(18, True)
+                GPIO.output(17, False)
+                time.sleep(10)
+                print("Door CLOSED")
+                GPIO.output(18, False)
+                GPIO.output(17, True)
                 #os.system("afplay /System/Library/Sounds/Basso.aiff")
-            else: print("NOT your face detected")
+            else: print("Authentication ERROR!")
+
+        
     # Display the frame
     cv2.imshow("Face Detection", frame)
 
     # Exit the script if the 'q' key is pressed
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
 
 # Release the camera and close the window
 camera.release()
