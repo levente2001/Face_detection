@@ -18,6 +18,8 @@ camera = cv2.VideoCapture(0)
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(18, GPIO.OUT)
 GPIO.setup(17, GPIO.OUT)
+GPIO.output(18, False)
+GPIO.output(17, True)
 
 while True:
     # Read a frame from the camera
